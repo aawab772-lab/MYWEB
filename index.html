@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>جدول ترتيب الفرق</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1000px;
+        }
+        
+        /* صفحة تسجيل الدخول */
+        .login-page {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+        
+        .login-page h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+        
+        .login-page input {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            text-align: center;
+            letter-spacing: 5px;
+        }
+        
+        .login-page input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+        }
+        
+        .login-page button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .login-page button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .error {
+            color: #e74c3c;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        
+        /* الجدول العام */
+        .standings-page {
+            display: none;
+        }
+        
+        .standings-page.active {
+            display: block;
+        }
+        
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 16px;
+        }
+        
+        .admin-btn {
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .admin-btn:hover {
+            background: #764ba2;
+        }
+        
+        .table-container {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: right;
+            font-weight: bold;
+        }
+        
+        td {
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        tr:hover {
+            background: #f9f9f9;
+        }
+        
+        .rank {
+            font-weight: bold;
+            color: #667eea;
+            font-size: 18px;
+        }
+        
+        .team-name {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        /* صفحة الإدارة */
+        .admin-page {
+            display: none;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        
+        .admin-page.active {
+            display: block;
+        }
+        
+        .admin-page h1 {
+            color: #333;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 15px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .form-group.full {
+            grid-column: 1 / -1;
+        }
+        
+        .form-group label {
+            display: block;
+            color: #333;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        
+        .form-group input {
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .teams-list {
+            margin-top: 30px;
+        }
+        
+        .teams-list h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+        
+        .team-row {
+            background: #f9f9f9;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+            align-items: end;
+        }
+        
+        .team-row input {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
+        
+        .btn-save, .btn-delete {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .btn-save {
+            background: #27ae60;
+            color: white;
+            flex: 1;
+        }
+        
+        .btn-save:hover {
+            background: #229954;
+        }
+        
+        .btn-delete {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .btn-delete:hover {
+            background: #c0392b;
+        }
+        
+        .btn-logout {
+            background: #95a5a6;
+            color: white;
+            padding: 10px 20px;
+        }
+        
+        .btn-logout:hover {
+            background: #7f8c8d;
+        }
+        
+        .success-msg {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .success-msg.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- صفحة تسجيل الدخول -->
+        <div class="login-page" id="loginPage">
+            <h1>🏆 جدول ترتيب الفرق</h1>
+            <p style="color: #666; margin-bottom: 30px;">أدخل الرمز للوصول إلى صفحة الإدارة</p>
+            <input type="password" id="adminCode" placeholder="أدخل الرمز" maxlength="5">
+            <button onclick="checkAdminCode()">دخول الإدارة</button>
+            <button onclick="viewStandings()" style="background: #95a5a6; margin-top: 10px;">عرض الجدول العام</button>
+            <div class="error" id="errorMsg"></div>
+        </div>
+        
+        <!-- صفحة الجدول العام -->
+        <div class="standings-page" id="standingsPage">
+            <div class="header">
+                <h1>🏆 جدول ترتيب الفرق</h1>
+                <p>آخر تحديث للبيانات</p>
+                <button class="admin-btn" onclick="goToAdmin()">الدخول للإدارة</button>
+            </div>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>المركز</th>
+                            <th>اسم الفريق</th>
+                            <th>عدد المباريات</th>
+                            <th>النقاط</th>
+                            <th>فارق الأهداف</th>
+                        </tr>
+                    </thead>
+                    <tbody id="standingsTable">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- صفحة الإدارة -->
+        <div class="admin-page" id="adminPage">
+            <h1>⚙️ لوحة التحكم الإدارية</h1>
+            
+            <div class="success-msg" id="successMsg">تم حفظ البيانات بنجاح!</div>
+            
+            <div class="teams-list">
+                <h2>إدارة الفرق</h2>
+                <div id="teamsContainer"></div>
+            </div>
+            
+            <div class="btn-group">
+                <button class="btn-save" onclick="saveAllData()">💾 حفظ البيانات</button>
+                <button class="btn-delete" onclick="addNewTeam()">➕ إضافة فريق</button>
+                <button class="btn-logout" onclick="logout()">🚪 تسجيل الخروج</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const ADMIN_CODE = "00000";
+        const STORAGE_KEY = "teamsData";
+        
+        // البيانات الافتراضية
+        const defaultData = [
+            { name: "الفريق الأول", matches: 10, points: 25, goalDiff: 15 },
+            { name: "الفريق الثاني", matches: 10, points: 22, goalDiff: 12 },
+            { name: "الفريق الثالث", matches: 10, points: 18, goalDiff: 8 },
+        ];
+        
+        // تحميل البيانات من التخزين
+        function loadData() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            return saved ? JSON.parse(saved) : defaultData;
+        }
+        
+        // حفظ البيانات
+        function saveData(data) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        }
+        
+        // ترتيب الفرق حسب النقاط
+        function sortTeams(teams) {
+            return teams.sort((a, b) => b.points - a.points);
+        }
+        
+        // عرض جدول الترتيب
+        function displayStandings() {
+            const teams = sortTeams(loadData());
+            const table = document.getElementById("standingsTable");
+            table.innerHTML = "";
+            
+            teams.forEach((team, index) => {
+                const row = table.insertRow();
+                row.innerHTML = `
+                    <td class="rank">${index + 1}</td>
+                    <td class="team-name">${team.name}</td>
+                    <td>${team.matches}</td>
+                    <td><strong>${team.points}</strong></td>
+                    <td>${team.goalDiff > 0 ? '+' : ''}${team.goalDiff}</td>
+                `;
+            });
+        }
+        
+        // عرض نموذج تعديل الفرق
+        function displayTeamsForm() {
+            const teams = loadData();
+            const container = document.getElementById("teamsContainer");
+            container.innerHTML = "";
+            
+            teams.forEach((team, index) => {
+                const row = document.createElement("div");
+                row.className = "team-row";
+                row.innerHTML = `
+                    <div>
+                        <label>اسم الفريق</label>
+                        <input type="text" value="${team.name}" id="name_${index}">
+                    </div>
+                    <div>
+                        <label>المباريات</label>
+                        <input type="number" value="${team.matches}" id="matches_${index}">
+                    </div>
+                    <div>
+                        <label>النقاط</label>
+                        <input type="number" value="${team.points}" id="points_${index}">
+                    </div>
+                    <div>
+                        <label>فارق الأهداف</label>
+                        <input type="number" value="${team.goalDiff}" id="goalDiff_${index}">
+                    </div>
+                    <div></div>
+                    <button class="btn-delete" onclick="deleteTeam(${index})">حذف</button>
+                `;
+                container.appendChild(row);
+            });
+        }
+        
+        // تحقق من رمز الإدارة
+        function checkAdminCode() {
+            const code = document.getElementById("adminCode").value;
+            const errorMsg = document.getElementById("errorMsg");
+            
+            if (code === ADMIN_CODE) {
+                errorMsg.textContent = "";
+                showAdminPanel();
+            } else {
+                errorMsg.textContent = "❌ الرمز غير صحيح!";
+            }
+        }
+        
+        // عرض لوحة الإدارة
+        function showAdminPanel() {
+            document.getElementById("loginPage").style.display = "none";
+            document.getElementById("standingsPage").style.display = "none";
+            document.getElementById("adminPage").classList.add("active");
+            displayTeamsForm();
+        }
+        
+        // عرض جدول الترتيب
+        function viewStandings() {
+            document.getElementById("loginPage").style.display = "none";
+            document.getElementById("adminPage").classList.remove("active");
+            document.getElementById("standingsPage").classList.add("active");
+            displayStandings();
+        }
+        
+        // الانتقال لصفحة الإدارة من الجدول العام
+        function goToAdmin() {
+            document.getElementById("adminCode").value = "";
+            document.getElementById("loginPage
